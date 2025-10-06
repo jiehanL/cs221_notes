@@ -57,6 +57,7 @@ def creating_tensors():
         ],
     ])
     s = x.shape  # @inspect s
+    ### 2 block, each with 2 row and 3 columns, so it's (2,2,3)
 
     text("You can extract slices from this tensor:")  # @clear s
     y = x[1]  # @inspect y
@@ -99,6 +100,9 @@ def tensor_examples():
     N = 3  # Number of examples
     # A dataset of N examples, each D-dimensional point
     x = np.ones((N, D))  # @inspect x
+
+    ## row : examples 
+    ## column : features 
 
     text("In language modeling, each example is a whole sequence of length")  # @clear x
     L = 4  # Length of sequence
@@ -178,6 +182,9 @@ def matrix_multiplication():
     assert y.shape == (2, 4, 3)
     text("In this case, for each slice x[0], x[1], ..., we multiply by `w`.")
     text("Terminology: w is broadcasted to each slice of x.")
+
+    #### @ always works on the last 2 d, 
+    #### any d before is treated as  batch dimensions and must be broadcast-compatible 
 
 
 def efficiency():
@@ -262,6 +269,9 @@ def einops_reduce():
 
     # New (einops) way
     y = reduce(x, "... hidden -> ...", "sum")  # @inspect y
+    #### hidden is the last axis 
+    #### reduction operation is sum 
+    #### ... means keep all else as they are
 
 
 def einops_rearrange():
@@ -274,9 +284,12 @@ def einops_rearrange():
 
     text("Break up `total_hidden` into two dimensions (`heads` and `hidden1`):")
     x = rearrange(x, "... (heads hidden1) -> ... heads hidden1", heads=2)  # @inspect x
+    ## if we want to break it up into 3 d then heads = 3 
+    ## but (heads hidden1) should be divisible by 3 
 
     text("Perform the transformation by `w`:")
     x = einsum(x, w, "... hidden1, hidden1 hidden2 -> ... hidden2")  # @inspect x
+    ### linear map on the last d, which is hidden1 
 
     text("Combine `heads` and `hidden2` back together:")
     x = rearrange(x, "... heads hidden2 -> ... (heads hidden2)")  # @inspect x

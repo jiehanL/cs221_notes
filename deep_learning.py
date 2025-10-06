@@ -63,6 +63,7 @@ def compare_numpy_and_pytorch():
     x = torch.tensor([1., 2, 3], requires_grad=True)  # @inspect x
     y = torch.tensor([4., 5, 6], requires_grad=True)  # @inspect y
     z = x @ y  # @inspect z
+    ### forward pass is computed eagerly during node construction (no `forward()` call)
     z.backward()  # @inspect x.grad y.grad
 
     text("In PyTorch:")
@@ -84,6 +85,7 @@ def node_or_value():
     z = Squared("z", y)  # By node @inspect z y @clear y
     u = Input("u", np.array(3.))  # @inspect u
     l2 = Add("l2", Squared("z2", Input("y", y.value)), u)  # By value @inspect l2 @clear u
+    ### detach y by setting y.value 
     image(z.get_graphviz().render("var/graph-sq-xyz", format="png"), width=50), image(l2.get_graphviz().render("var/graph-sq-xyz2", format="png"), width=100)
     backpropagation(l2)  # @inspect z l2  # Doesn't propagate to x!
     text("Note that `u.grad` is computed, but `x.grad` is not.")
@@ -102,6 +104,7 @@ def node_or_value():
     text("Sometimes you want to just compute values with no gradients.")
     text("Common use case: prediction at test-time (not updating parameters).")
     with torch.no_grad():
+        ## no gradient computation for x
         y = x ** 2  # @inspect y
         z = y ** 2  # @inspect z
 
@@ -132,16 +135,18 @@ def linear_models():
     cross_entropy = nn.CrossEntropyLoss()
     loss = cross_entropy(logits, target_y)  # compare target_y and softmax(logits) @inspect loss
     loss.backward()  # @inspect model.weight.grad model.bias.grad
+    ### loss backprop compute the gradient of the loss with respect to the model parameters
 
     # Optimizer (SGD = stochastic gradient descent, but using it to just take a gradient)
     optimizer = torch.optim.SGD(model.parameters(), lr=0.1)
     optimizer.step()  # Updates the parameters @inspect model.weight model.bias
+    ### optimizer.step() updates the model parameters using the gradients
+    ### it's different from loss.backward() because it updates the model parameters
 
     # Complete the full loop
     training_data = get_training_data()  # @inspect training_data @stepover @clear x target_y logits loss model.weight model.bias model.weight.grad model.bias.grad
     result = train_model(model, training_data)
     plot(result)
-
     text("Summary:")
     text("- Define a model (e.g., linear): inputs to logits")
     text("- Define a loss (e.g., cross entropy): logits, targets to loss")
@@ -213,6 +218,7 @@ def nonlinear_motivation():
     text("There are actually a lot of non-linear models")
     text("- decision trees, nearest neighbors, neural networks")
     text("...and even linear models!")
+    ### in a sense that liear model represent nonlinear dicision boundaries in a higher dimensional space
     text("Wait, what?")
 
     text("Suppose we wanted to define a quadratic classifier:")
@@ -282,7 +288,11 @@ def multi_layer_perceptron_linear():
     logits2 = x @ (w1 @ w2)  # This is just a linear classifier!  @inspect logits2
     text("which we can rewrite as:")
     w = w1 @ w2  # A single weight vector @inspect w
+<<<<<<< Updated upstream
     logits2 = x @ w  # @inspect logits2
+=======
+    logits2 = x @ w  # This is just a linear classifier!  @inspect logits2institutions
+>>>>>>> Stashed changes
 
     text("Ok, so how do we actually go beyond linear classifiers?")
 
@@ -319,6 +329,7 @@ def multi_layer_perceptron():
     text("Where does the name **multi-layer perceptron** come from?")
     text("Perceptrons came from Frank Rosenblatt's 1958 paper (linear classifier)")
     text("1970s: multi-layer perceptrons (neural networks)")
+    ### stacking layers of neurons to form a deep neural network
 
     # Data
     training_data = get_training_data()  # @inspect training_data @stepover
@@ -332,13 +343,19 @@ def multi_layer_perceptron():
     text("Terminology: activations = hidden units = neurons")
     text("Caution: ReLU has zero gradient when x <= 0; can result in \"dead neurons\".")
     text("Fix: use activation function that doesn't have (near-)zero gradients (e.g., Leaky ReLU, GeLU, Swish, etc.)")
+
     text("Balance tradeoff between linear (better gradients) with non-linear (better expressivity).")
 
     # Train
     result = train_model(model, training_data)  # @stepover
     plot(result)
 
+<<<<<<< Updated upstream
     text("Summary: x -[linear][relu]→ hidden -[linear]→ logits")
+=======
+    text("Summary: x -[linear][relu]-> hidden -[linear]-> logits")
+    ### relu here is a non-linear activation function
+>>>>>>> Stashed changes
 
 
 def relu(x: torch.Tensor) -> torch.Tensor:
@@ -409,6 +426,7 @@ def vanishing_exploding_gradient_problem():
         x = x * w  # @inspect x
     x.backward()  # @inspect w.grad
 
+    ### core problem of deep learning: too many layers stacking up so the gradient becomes too small/big 
     text("So ideally, you want w close to 1 for stability.")
     text("The problem occurs for matrices too (want eigenvalues of w to be close to 1).")
 

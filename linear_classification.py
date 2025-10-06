@@ -241,6 +241,7 @@ def gradient_zero_one_loss(example: Example, params: Parameters) -> Parameters: 
     margin = logit * example.target_y  # @inspect margin
     # Zero everywhere except when margin = 0, where it's undefined
     return Parameters(weight=np.zeros_like(params.weight), bias=0)
+    #### margin is a step function, which is flat everywhere 
 
 
 def logistic_function():
@@ -276,6 +277,7 @@ def logistic_function():
     prob1 = logistic(logit=3)  # @inspect prob1 @stepover
     prob2 = logistic(logit=-3)  # @inspect prob2 @stepover
     assert np.allclose(prob1 + prob2, 1)
+    #### sigma(z) + sigma(-z) = 1
 
     text("The derivative of the logistic function is quite simple and elegant")
     grad_prob = gradient_logistic(logit=3)  # @inspect grad_prob
@@ -317,6 +319,8 @@ def logistic_loss_function():
     prob_neg = logistic(-logit)  # p(y=-1|x) @inspect prob_neg @stepover
     margin = logit * example.target_y  # @inspect margin
     prob_target = logistic(margin)  # p(y=target_y|x) @inspect prob_target @stepover
+    #### easier representation than prob_pos becuase 
+    #### when prediction is correct, margion >0, 
 
     text("**Maximum likelihood** principle: maximize the log probability of the training targets")
 
@@ -381,6 +385,7 @@ def gradient_logistic_loss(example: Example, params: Parameters) -> Parameters: 
     loss = -np.log(logistic(margin))  # @inspect loss @stepover
     grad_logit = -logistic(-margin)  # @inspect grad_logit @stepover
     grad_weight = example.target_y * example.x * grad_logit  # @inspect grad_weight
+    #### chain rule: grad(logit) * grad m wrt to weight = yx 
     grad_bias = example.target_y * grad_logit  # @inspect grad_bias
     return Parameters(weight=grad_weight, bias=grad_bias)
 
@@ -471,9 +476,10 @@ def introduce_softmax():
 
 def softmax(logits: np.ndarray) -> np.ndarray:  # @inspect logits
     exp_logits = np.exp(logits)  # @inspect exp_logits
+    #### makes all scores positive, also exaggerates differences
     probs = exp_logits / np.sum(exp_logits)  # @inspect probs
     return probs
-
+    #### soft max turns arbitrary real-valued scores into probabilities across classes
 
 def cross_entropy_loss(params: Parameters, example: Example) -> float:  # @inspect params example
     num_classes = len(params.weight)  # @inspect num_classes
@@ -501,6 +507,7 @@ def introduce_cross_entropy():
     terms = target * -np.log(predicted)  # @inspect terms
     cross_entropy = np.sum(terms)  # @inspect cross_entropy
     text("This is the same as the negative log probability of the target class.")
+    #### since target = [0, 1, 0], only the second term survived. 
 
 
 def representing_text():
@@ -517,7 +524,13 @@ def representing_text():
     text("### Interpretation")
     text("Represent each index as a one-hot vector.")
     index = indices[4]  # @inspect index
-    vector = np.eye(len(vocab))[index]  # @inspect vector @stepover
+    vector = np.eye(len(vocab))[index]  # @inspect vector @stepove
+    #### each word get assigned an index, tho words might repeat, they only have 1 index
+    #### then we represent the sentence in a sequence of indices, indecies = [...]
+    ### one hot
+        ### vector of length = len(vocab) = 4, because 
+        ### all entries are 0 except a single 1 at the index of the word 
+
 
     text("So the string is represented as a sequence of vectors, or a matrix:")
     matrix = np.eye(len(vocab))[indices]  # @inspect matrix @stepover @clear index vector
@@ -539,6 +552,10 @@ def representing_text():
     text("Represent each token as a (one-hot) vector.")
     text("Represent each text as the average of the token vectors.")
     bow = reduce(matrix, "pos vocab -> vocab", "mean")  # @inspect bow
+    ### collapse across pos dimension, keep vocab dimension
+    ### then take the avearge 
+    ### if one-hot matrix shape = [5,4]
+    ### then length(vocab) = 4 
     text("Then we can operate on this fixed-dimensional vector.")
     y_bow = bow @ w  # @inspect y_bow
 

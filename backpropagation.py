@@ -54,7 +54,7 @@ def einops_review():
 
     # Sum: y += x[i] for all i
     y = einsum(x, "i ->")  # @inspect y
-
+    ### y is an order zero tensor; the right to the --> denotes the order of the output tensor
     # Elementwise product: y[i] += x[i] * x[i] for all i
     y = einsum(x, x, "i, i -> i")  # @inspect y
 
@@ -63,6 +63,7 @@ def einops_review():
 
     # Outer product: y[i][j] += x[i] * x[j] for all i, j
     y = einsum(x, x, "i, j -> i j")  # @inspect y
+    ### note that there's no transpose here 
 
     # Triple elementwise product: y[i] = x[i] * x[i] * x[i] for all i
     y = einsum(x, x, x, "i, i, i -> i")  # @inspect y
@@ -211,6 +212,7 @@ def example_vector():
     text("Let us analytically compute the gradient:")
     def df(x: np.ndarray) -> np.ndarray:
         return 2 * np.sum(x) * np.ones_like(x)
+        ### np.ones_like(x) is a vector of ones with the same shape as x
     dy = df(np.array([1, 2]))  # @inspect dy @stepover
 
     text("These functions work for any number of dimensions:") # @clear y dy
@@ -251,9 +253,11 @@ def computation_graphs_example():
     x1 = Input("x1", np.array(2.0))  # @inspect x1
     x2 = Input("x2", np.array(3.0))  # @inspect x2 @stepover
     sum = Add("sum", x1, x2)  # @inspect sum  @stepover
+    #### sum is an Add node with dependencies x1 and x2
     sum.forward()  # @inspect sum
     y = Squared("y", sum)  # @inspect y @stepover @clear sum
     y.forward()  # @inspect y
+    #### the strucutre represent the computation graph
 
     text("Summary so far:")  # @clear y
     text("- Each input (leaf) node represents some fixed value (e.g., `x1`).")
@@ -378,6 +382,8 @@ class Add(Node):
     def backward(self):  # @inspect self
         x, y = self.dependencies
         x.grad += self.grad  # @inspect self
+        ## self.grad is the gradient of the output with respect to the output of the root node, i.e. y
+        ## the meaning of self.grad is always wrt to the root node
         y.grad += self.grad  # @inspect self
 
 
