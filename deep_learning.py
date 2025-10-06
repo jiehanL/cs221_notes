@@ -289,7 +289,11 @@ def multi_layer_perceptron_linear():
     text("which we can rewrite as:")
     w = w1 @ w2  # A single weight vector @inspect w
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     logits2 = x @ w  # @inspect logits2
+=======
+    logits2 = x @ w  # This is just a linear classifier!  @inspect logits2institutions
+>>>>>>> Stashed changes
 =======
     logits2 = x @ w  # This is just a linear classifier!  @inspect logits2institutions
 >>>>>>> Stashed changes
@@ -355,6 +359,9 @@ def multi_layer_perceptron():
 =======
     text("Summary: x -[linear][relu]-> hidden -[linear]-> logits")
     ### relu here is a non-linear activation function
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
 
 
