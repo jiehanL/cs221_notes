@@ -272,12 +272,17 @@ def computation_graphs_example():
     link("https://stanford-cs221.github.io/autumn2023/modules/module.html#include=machine-learning%2Fbackpropagation.js&mode=print6pp", title="Reference: Autumn 2023 slides")
 
     text("Let us compute dy/dx1.")
+    ####  initializes gradients at each node
     y.grad = np.ones_like(y.value)  # @inspect y
+    #### each .grad holds ∂output / ∂node_value.
+    #### only y.grad hold 1 because ∂ y / ∂ y = 1
     sum.grad = np.zeros_like(sum.value)  # @inspect y
     x1.grad = np.zeros_like(x1.value)  # @inspect y
     x2.grad = np.zeros_like(x2.value)  # @inspect y
     y.backward()  # @inspect y
+    #### propagate from y to sum
     sum.backward()  # @inspect y
+    #### propagate from sum to x1, x2
 
     text("In general:")
     text("- `node.backward()` updates the partial derivatives of the dependencies of `node`.")

@@ -86,6 +86,7 @@ def node_or_value():
     u = Input("u", np.array(3.))  # @inspect u
     l2 = Add("l2", Squared("z2", Input("y", y.value)), u)  # By value @inspect l2 @clear u
     ### detach y by setting y.value 
+    ### It creates a new tensor with the same value as y, but breaks the link to the original graph (x → y).
     image(z.get_graphviz().render("var/graph-sq-xyz", format="png"), width=50), image(l2.get_graphviz().render("var/graph-sq-xyz2", format="png"), width=100)
     backpropagation(l2)  # @inspect z l2  # Doesn't propagate to x!
     text("Note that `u.grad` is computed, but `x.grad` is not.")
@@ -107,7 +108,7 @@ def node_or_value():
         ## no gradient computation for x
         y = x ** 2  # @inspect y
         z = y ** 2  # @inspect z
-
+    ### The result tensors y and z are just plain values, not connected nodes.
     text("Now, you can't backpropagate through `z` at all.")
     try:
         z.backward()  # @inspect z
@@ -129,6 +130,9 @@ def linear_models():
     # Linear model
     torch.manual_seed(1)
     model = nn.Linear(4, 3)  # @inspect model.weight model.bias
+    #### input d = 4, output d = 3 
+    #### weight matrix shape (3,4)
+    #### bias shape of (3,)
     logits = model(x)  # @inspect logits
 
     # Loss function
