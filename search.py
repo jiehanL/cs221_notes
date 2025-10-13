@@ -37,6 +37,17 @@ def main():
     text("Search is increasingly important (e.g., test-time compute in language models)!")
     text("You just also need learning too.")
 
+    #### 
+    # 1.	Exact methods:
+    #   Exhaustive search (try all action sequences; define future cost).
+    #   Dynamic programming (DP) (exhaustive search + caching by state).
+    # 2.    Approximate methods:
+    #   Best‑of‑n (rollouts) with a policy (e.g., uniform or LM‑based).
+    #   Beam search (keep top‑k partial solutions by cost‑so‑far).
+
+
+
+    #### 
     # Modeling
     search_problem()
     
