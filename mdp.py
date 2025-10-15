@@ -37,6 +37,8 @@ def main():
     text("- MDPs: generalize search problems (action result in distribution over next states)")
     text("- Policy (solution): maps state to action")
     text("- MDP + policy → rollout → utility")
+    #### rollout is one simulation from your current state. 
+    # The purpose is for an agent to evaluate many possible next actions in order to find an action that will maximize value
     text("- Value of policy = expected utility of policy")
     text("- Policy evaluation: computes value of a given policy")
     text("- Value iteration: computes value of the optimal policy")
@@ -224,12 +226,14 @@ class Rollout:
     def __init__(self, steps: list[Step], discount: float):
         self.steps = steps  # @inspect self.steps
         self.discount = discount  # @inspect self.discount
+        #### kinda like a length penalty
         self.utility = compute_utility(steps, discount)  # @inspect self.utility
         
 
 def compute_utility(steps: list[Step], discount: float) -> float:
     """Computes the utility (discounted sum of rewards) of a rollout."""
     rewards = [step.reward * discount ** i for i, step in enumerate(steps)]  # @inspect rewards
+    ## there's other form of discout as well is just we are not using it 
     utility = sum(rewards)  # @inspect utility
     return utility
 
@@ -260,6 +264,7 @@ def monte_carlo_policy_evaluation(mdp: MDP, policy: Policy, num_rollouts: int) -
     """Evaluate the policy and return the expected utility."""
     utilities = [generate_rollout(mdp, policy).utility for _ in range(num_rollouts)]  # @inspect utilities @stepover
     average_utility = np.mean(utilities)  # @inspect average_utility
+    ### increase the rollout, it will converge to the correct answer faster 
     return average_utility
 
 
