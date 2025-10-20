@@ -218,6 +218,11 @@ def tram_if_possible_policy(mdp: MDP, state: int) -> str:
 
 @dataclass
 class Rollout:
+    ### generate a sequence of actions that produces a utility
+    ### the utility is the discounted sum of rewards
+    ### the discount is a factor that determines how important the future rewards are
+    ### the steps are the sequence of actions
+    ### the discount is a factor that determines how important the future rewards are
     """Represents a rollout of an MDP (sequence of actions that produces a utility)."""
     steps: list[Step]
     discount: float
@@ -226,6 +231,9 @@ class Rollout:
     def __init__(self, steps: list[Step], discount: float):
         self.steps = steps  # @inspect self.steps
         self.discount = discount  # @inspect self.discount
+        #### if =1, future rewards are just as important as the present rewards
+        #### if =0, future rewards are not important at all
+        #### if =0.5, future rewards are half as important as the present rewards
         #### kinda like a length penalty
         self.utility = compute_utility(steps, discount)  # @inspect self.utility
         
@@ -249,8 +257,10 @@ def generate_rollout(mdp: MDP, policy: Policy) -> Rollout:
 
         # MDP: choose a successor according to that action
         successors = [successor for successor in mdp.successors(state) if successor.action == action]  # @inspect successors @stepover
+        #### gets all the successors for the action
         probs = [successor.prob for successor in successors]  # @inspect probs
         choice = np.random.choice(len(successors), p=probs)  # @inspect choice
+        #### chooses a successor according to the probabilities randomly
         step = successors[choice]  # @inspect step
         steps.append(step)  # @inspect steps
 
