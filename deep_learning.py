@@ -80,6 +80,7 @@ def node_or_value():
     text("- Use the node directly: new values will backprop through the node")
     text("- Use the node's value: new values will **not** backprop through the node")
 
+    ### this is the numpy version of the computation graph
     x = Input("x", np.array(1.))  # @inspect x
     y = Squared("y", x)  # @inspect y @clear x
     z = Squared("z", y)  # By node @inspect z y @clear y
@@ -134,10 +135,12 @@ def linear_models():
     #### weight matrix shape (3,4)
     #### bias shape of (3,)
     logits = model(x)  # @inspect logits
+    ## forward pass is computed eagerly during node construction (no `forward()` call)
 
     # Loss function
     cross_entropy = nn.CrossEntropyLoss()
-    loss = cross_entropy(logits, target_y)  # compare target_y and softmax(logits) @inspect loss
+    loss = cross_entropy(logits, target_y)  
+    #### compare target_y and softmax(logits) @inspect loss
     loss.backward()  # @inspect model.weight.grad model.bias.grad
     ### loss backprop compute the gradient of the loss with respect to the model parameters
 
@@ -147,7 +150,15 @@ def linear_models():
     ### optimizer.step() updates the model parameters using the gradients
     ### it's different from loss.backward() because it updates the model parameters
 
-    # Complete the full loop
+
+    ### for example 
+    ### predict y hat = wx
+    ### loss = (y hat - y) ** 2
+    ### gradient of loss with respect to w = 2(y hat - y) * x
+    ### update w = w - learning_rate * gradient of loss with respect to w
+    ### this is done in the optimizer.step()
+    
+
     training_data = get_training_data()  # @inspect training_data @stepover @clear x target_y logits loss model.weight model.bias model.weight.grad model.bias.grad
     result = train_model(model, training_data)
     plot(result)
@@ -241,11 +252,13 @@ def nonlinear_motivation():
     text("But let us define a fixed non-linear feature map:")
     def feature_map(x: np.ndarray) -> np.ndarray:
         return np.array([x[0], x[1], x[0] ** 2 + x[1] ** 2])
+        ### phi(x) = [x[0], x[1], x[0] ** 2 + x[1] ** 2]
 
     text("Then we define a linear predictor:")
     def predictor(x: np.ndarray) -> int:  # @inspect x
         phi = feature_map(x)  # @inspect phi
-        # This is a predictor that is *linear* in phi
+        # This is a predictor that is *linear* in phi because 
+        # logit = -2 x1 - 2 x2 + (x1 ** 2 + x2 ** 2)
         logit = -2 * phi[0] - 2 * phi[1] + phi[2]  # @inspect logit
         if logit > 0:
             predicted_y = 1  # @inspect predicted_y
@@ -265,6 +278,7 @@ def nonlinear_motivation():
     text("2. Learn a linear predictor on the processed data.")
 
     text("Drawback: `feature_map` is fixed...can we learn it as well?")
+    
 
 
 def multi_layer_perceptron_linear():
@@ -311,6 +325,8 @@ class LinearMLP(nn.Module):
         # Maps input to hidden layer pre-nonlinearity
         self.w1 = nn.Linear(input_dim, hidden_dim)
         # Maps hidden layer to output logits
+        ## there's no non-linearity here because there's no activation function such as ReLU, tanh, sigmoid, etc.
+        ## relu only keeps positive values and sets negative values to 0
         self.w2 = nn.Linear(hidden_dim, num_classes)
     
     def forward(self, x):  # @inspect x
@@ -347,6 +363,8 @@ def multi_layer_perceptron():
     # Model
     torch.manual_seed(2)
     model = MultiLayerPerceptron(input_dim=input_dim, hidden_dim=5, num_classes=num_classes)  # @inspect model
+    ### hidden_dim is the width of the hidden layer: the number of hidden neurons 
+    ### ususally start small and increase as the model gets deeper
     logits = model(training_data[0].x)  # @inspect logits
     text("Terminology: activations = hidden units = neurons")
     text("Caution: ReLU has zero gradient when x <= 0; can result in \"dead neurons\".")
@@ -474,6 +492,9 @@ def residual_connections():
     text("For f(x) = w x,")
     text("each layer computes:x → (1 + w) x")
     text("which keeps the multiplier away from zero (still can explode if w is large).")
+    ### Instead of a layer learning a full mapping x \mapsto H(x), 
+    ### we make it learn a residual F(x) and add the input back: 
+    ### \boxed{y = x + F(x)} \qquad\text{(residual block)}
 
     # Data
     training_data = get_training_data()  # @stepover
@@ -552,6 +573,7 @@ def layer_normalization():
 def initialization():
     text("We have seen that the magnitude of activations can grow too big or small.")
     text("We can avoid this by using proper initialization.")
+    ## question: how to initialize the weights of the neural network?
 
     input_dim = 16384
     output_dim = 32

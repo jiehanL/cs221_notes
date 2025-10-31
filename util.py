@@ -1,8 +1,10 @@
 from edtrace import link
-from typing import Callable
+from typing import Callable, Any
 from altair import Chart, Data
 import functools
 import numpy as np
+import random
+import torch
 
 
 def article_link(url):
@@ -55,3 +57,22 @@ class Vocabulary:
             "index_to_string": self.index_to_string,
             "string_to_index": self.string_to_index,
         }
+
+
+def set_random_seed(seed: int):
+    """Set all random seeds for deterministic behavior."""
+    random.seed(seed)
+    torch.manual_seed(seed)
+    np.random.seed(seed)
+
+
+def one_hot(index: int, length: int) -> torch.Tensor:
+    """Create a one-hot vector of the given `length` with a 1 at the `index` position."""
+    vector = torch.zeros(length)
+    vector[index] = 1
+    return vector
+        
+
+def sample_dict(choices: dict[Any, float]) -> Any:
+    """Sample a key from a dictionary of choices based on their probabilities (values)."""
+    return np.random.choice(list(choices.keys()), p=list(choices.values()))

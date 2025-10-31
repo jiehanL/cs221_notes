@@ -47,4 +47,21 @@ To run locally:
 
 ### Wed Oct 15: reinforcement learning (lecture 8)
 
-- [rl](https://stanford-cs221.github.io/autumn2025-lectures/?trace=rl): under construction
+- [reinforcement_learning](https://stanford-cs221.github.io/autumn2025-lectures/?trace=reinforcement_learning)
+
+### Mon Oct 20: policy gradient (lecture 9)
+
+- [policy_gradient](https://stanford-cs221.github.io/autumn2025-lectures/?trace=policy_gradient)
+
+### Wed Oct 22: games i (lecture 10)
+
+- [games](https://stanford-cs221.github.io/autumn2025-lectures/?trace=games)
+
+### Mon Oct 27: games ii (lecture 11)
+
+- [td_learning](https://stanford-cs221.github.io/autumn2025-lectures/?trace=td_learning)
+- [simultaneous_games](https://stanford-cs221.github.io/autumn2025-lectures/?trace=simultaneous_games)
+
+### Wed Oct 29: bayes i (lecture 12)
+
+- [bayes](https://stanford-cs221.github.io/autumn2025-lectures/?trace=bayes)
