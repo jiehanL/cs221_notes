@@ -55,7 +55,9 @@ def model_based_motivation():
     text("Model-free methods are more direct and cheaper")
     text("...but model-based methods are more flexible")
     text("(can change the reward function without changing the transitions).")
-
+    ### because for model based methods, we need to know the transition function and the reward function
+    ### and when it changes, we need to change the model. 
+    ### hence model based methods are more flexible.  
     text("How should we represent the state of the world?")
 
 
@@ -102,7 +104,9 @@ def review_probability():
     text("We can also use einops to compute the conditional distribution,")
     text("...but there are a few steps.")
     R1 = np.array([0, 1])  # Evidence [R = 1]
+    ## ignore r = 0, keep r = 1 
     P_SR1 = ProbTable("S R=1", einsum(P_SR.p, R1, "s r, r -> s"))  # Filter to r = 1 @inspect P_SR1 @stepover
+    ## sum over r 
     P_R1 = ProbTable("R=1", einsum(P_SR1.p, "s ->"))  # @inspect P_R1 @stepover
     P_S_given_R1 = ProbTable("S | R=1", P_SR1.p / P_R1.p)  # @inspect P_S_given_R1 @stepover
 
@@ -265,6 +269,8 @@ def introduce_alarm():
     p_b = ProbTable("B", [1 - epsilon, epsilon]) # p(b) @inspect p_b @stepover
     p_e = ProbTable("E", [1 - epsilon, epsilon]) # p(e) @inspect p_e @stepover
     p_a_given_be = ProbTable("A | B E", lambda b, e, a: a == (b or e), shape=(2, 2, 2))  # p(a | b, e) @inspect p_a_given_be @stepover
+    ### each B, E, A  is binary {0,1}
+    ### return true if a = (b or e)
 
     text("**Step 4**: Define the joint distribution as the product of the local conditional probabilities")
 
@@ -499,6 +505,8 @@ def introduce_rejection_sampling():
     sample = hidden_markov_model()
     query = lambda sample: sample["H"][2]
     evidence = lambda sample: sample["E"][4] == 2
+    ### what is the probability of the object being at position 3 given the sensor reading at time 5 is 2?
+    ### H_n depends on H_{n-1}, E_n depends on H_n
     result = rejection_sampling(hidden_markov_model, query, evidence, num_samples=200)  # @inspect result @stepover
 
     text("Summary:")
