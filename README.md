@@ -65,3 +65,11 @@ To run locally:
 ### Wed Oct 29: bayes i (lecture 12)
 
 - [bayes](https://stanford-cs221.github.io/autumn2025-lectures/?trace=bayes)
+
+### Mon Nov 3: gibbs sampling (lecture 13)
+
+- [gibbs_sampling](https://stanford-cs221.github.io/autumn2025-lectures/?trace=gibbs_sampling)
+
+### Wed Nov 5: learning (lecture 14)
+
+- [bayes_learning](https://stanford-cs221.github.io/autumn2025-lectures/?trace=bayes_learning)
