@@ -291,8 +291,18 @@ def einops_rearrange():
     x = einsum(x, w, "... hidden1, hidden1 hidden2 -> ... hidden2")  # @inspect x
     ### linear map on the last d, which is hidden1 
 
-    text("Combine `heads` and `hidden2` back together:")
-    x = rearrange(x, "... heads hidden2 -> ... (heads hidden2)")  # @inspect x
+# 	•	Flatten last two dims:
+# "... a b -> ... (a b)"
+# 	•	Flatten many middle dims:
+# "b ... d -> b (...) d"
+# 	•	Unflatten hidden into heads × head_dim:
+# "... h -> ... heads d", heads=H
+# 	•	Move then flatten (e.g., (B, H, L, D2) → (B, L, H*D2)):
+# "B H L D2 -> B L (H D2)"
+# 	•	Reorder only (no size change):
+# "b l d -> b d l"
+#     text("Combine `heads` and `hidden2` back together:")
+#     x = rearrange(x, "... heads hidden2 -> ... (heads hidden2)")  # @inspect x
 
 
 if __name__ == "__main__":
